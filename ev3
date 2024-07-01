@@ -1,0 +1,112 @@
+import os
+os.system ("cls")
+matriz=[]
+
+menu_principal="""
+Menu
+1) Registrar vehiculo
+2) Listar vehiculos registrados
+3) Imprimir orden de reparación
+4) Salir del programa
+Seleccione su opción: """
+
+def registrar_vehiculo(): #opc 1
+    while True:
+        try:
+            os.system("cls")
+            print("Agregar vehiculo")
+            marca = input("Marca: ")
+            año = int(input("Año: "))
+            kilometraje=int(input("Kilometraje: "))
+            CostEst= int(input("Costo estimado: $"))
+            impuesto= (CostEst*0.8)
+            CostTotal= (CostEst+impuesto)
+            matriz.append([marca,año,kilometraje,CostEst,impuesto,CostTotal]) 
+            input("REGISTRO AGREGADO CON EXITO!")
+            break 
+        except:
+            input("excepcion al ingresar")
+
+def generar_reporte():
+    texto = '''     LISTADO GENERAL
+________________________________________________________________________________ 
+|       |          |       |             |             |            |           |
+|  N°   |   Marca  |  Año  | Kilometraje |  Costo      |  Impuesto  |  Costo    |
+|       |          |       |             | Estimado($) |    (8%)    |  Total($) |
+|_______|__________|_______|_____________|_____________|____________|___________|
+-------------------------------------------
+'''
+    for row in range(len(matriz)):
+        texto += f"{row+1:3d} "  
+        texto += f"{matriz[i][0]:11d}"
+        texto += f"{matriz[i][1]:8s}"
+        texto += f"{matriz[i][2]:14d}"
+        texto += f"{matriz[i][3]:14d}"
+        texto += f"{matriz[i][4]:13d}"
+        texto += f"{matriz[i][5]:12d}"
+    texto += "Fin Lista " + '\n'
+    texto += f"cantidad total de filas    = {len(matriz)}" + '\n'
+    texto += f"cantidad de total columnas = {len(matriz[0])}" +'\n'
+
+    return texto
+
+def generar_archivo():
+    with open('vehiculos.txt','w', encoding='utf-8') as archivo:
+        archivo.write(generar_reporte())
+
+def listar(): #opc 2
+    try:
+        os.system("cls")
+        print(generar_reporte())
+        input("\nEnter para continuar...")
+    except:
+            input("excepcion al mostrar")
+    
+
+def imprimir_orden (): #opc 3
+        try:
+            opc = int(input("""
+        Que desea imprimir
+        1. todos
+        2. Toyota
+        3. Ford
+        4. Chevrolet
+        """))
+            if opc == 1:
+                reporte=generar_reporte(0)
+                with open ("lista.txt","w") as archivo:
+                    archivo.write(reporte)
+            elif opc == 2:
+                reporte=generar_reporte("Toyota")
+                with open ("lista.txt","w") as archivo:
+                    archivo.write(reporte)
+            elif opc == 3:
+                reporte=generar_reporte("Ford")
+                with open ("lista.txt","w") as archivo:
+                    archivo.write(reporte)
+            elif opc == 4:
+                reporte=generar_reporte("Chevrolet")
+                with open ("lista.txt","w") as archivo:
+                    archivo.write(reporte)
+        except:
+             print("Excepción")
+
+while True:
+     try:
+        os.system("cls")
+        opc=int(input(menu_principal))
+        if opc==1:
+            registrar_vehiculo
+        elif opc==2:
+            listar
+        elif opc==3:
+            imprimir_orden
+        elif opc==4:
+             break
+        
+        else: 
+            input("error")
+     except:
+        input("Excepción")
+
+input("Presione ENTER para salir")
