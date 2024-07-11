@@ -1,0 +1,214 @@
+import os
+
+# crear una matriz que guarda: rut,nombre, sueldo
+# asignado 4 filas y cada fila tiene 3 columnas
+matriz = [
+    ["111-1","SUSANA HORIA",750000],
+    ["222-2","ELTON TERA",950000],
+    ["333-3","MARIO NETA",865000],
+    ["444-4","ZACARIAS LABARCA",795000],
+]
+menu = '''
+1. Agregar
+2. Mostrar
+3. Buscar por rut
+4. remover por rut
+5. editar por rut
+6. Crear archivo listado general (txt)
+7. Exportar datos a CSV
+8. Exportar datos a JSON
+0. Salir
+'''
+
+def generarReporte():
+    '''
+    Crea una variable con todos los datos necesarios, tanto etiquetas como
+    filas de los registros.
+    
+    Retorna String con el texto solicitado
+    '''
+    texto = '''     LISTADO GENERAL
+-------------------------------------------
+N°      RUT         NOMBRE          SUELDO 
+-------------------------------------------
+'''
+    for row in range(len(matriz)):
+        texto += f"{row+1:3d} "  # numero desde 1 con ancho de 3
+        texto += f"{matriz[row][0]:12s}" # rut, col 0, ancho de 12, String
+        texto += f"{matriz[row][1]:20s}"    # nombre, col 1, ancho de 20s
+        texto += f"{matriz[row][2]:8d}"    # sueldo, col 2, ancho de 8d
+        texto += '\n' # salto a la linea siguiente
+    texto += "##############  FIN LISTADO   ###############" + '\n'
+    texto += f"cantidad total de filas    = {len(matriz)}" + '\n'
+    texto += f"cantidad de total columnas = {len(matriz[0])}" +'\n'
+
+    return texto
+
+import datetime
+def crearArchivo(): # opcion 6
+    ''' 
+    Crea el archivo "personas.txt"
+    donde escribe el listado general de todas las personas
+    junto con sus datos
+    al final de la hoja, agregar la fecha y hora actual, ejem: 
+    FECHA Y HORA DE REPORTE: xxxxxxxxxxx
+    '''
+    ahora = datetime.datetime.now()
+    fecha = str(ahora.day) + '/' + str(ahora.month) + '/' + str(ahora.year)
+    hora = str(ahora.hour) + ':' + str(ahora.minute)
+    with open('personas.txt','w', encoding='utf-8') as archivo:
+        archivo.write(generarReporte())
+        archivo.write(f"FECHA Y HORA DE REPORTE: {fecha} {hora}")
+    
+import csv
+def exportarCSV(): # opcion 7
+    '''
+    Genera archivo "personas.csv" con todos los elementos de la matriz
+    '''
+    with open('personas.csv','w',encoding='utf-8', newline='') as archivo:
+        escritor = csv.writer(archivo)
+        escritor.writerow(['rut','nombre','sueldo'])
+        escritor.writerows(matriz)
+
+import json
+def exportarJSON(): # opcion 8
+    '''
+    Genera archivo "personas.json" con todos los elementos de la matriz
+    '''
+    with open('personas.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        data = [row for row in reader]
+    with open('personas.json', 'w') as jsonfile:
+        json.dump(data, jsonfile)
+
+
+
+def buscarRut(rut):
+    '''
+    Busca rut recibido como parametro (rut)
+    
+    retorna el numero de la fila donde se encuentra el rut
+    sino lo encuentra devolverá -1
+
+    ejemplo:
+    fila = buscarRut("222-2")
+    if fila == -1:
+       print("no encontrado")
+    else:
+       print(f"entrado en fila: {fila}")
+       print(f"su nombre: {matriz[fila][1]}")
+       print(f"su sueldo: {matriz[fila][2]}")
+       
+    '''
+    try: 
+        for row in range(len(matriz)):
+            if rut == matriz[row][0]:
+                return row # si lo encuetra, se detiene y retorna la ubic
+        return -1 # si llega a esta linea, no lo encontró, retorn -1
+    except:
+        input("excepcion al buscar por rut")
+
+def agregar():
+    while True:
+        try:
+            os.system("cls")
+            print("AGREGAR DATOS")
+            rut = input("rut: ")
+            encontrado = buscarRut(rut)
+            if encontrado == -1:
+                input(f"{rut} no ha sido encontrado...")
+                nom = input("nombre: ")
+                sueldo = int(input("sueldo: "))
+                matriz.append([rut,nom,sueldo]) # creamos la lista [] y agregamos
+                input("REGISTRO AGREGADO CON EXITO!")
+                break # sale y regresa al main()
+            else:
+                print("rut ingresado previamente")
+                input(f"los datos: {matriz[encontrado]}")
+                break
+        except:
+            input("excepcion al ingresar")
+
+def buscar():
+    try:
+        os.system("cls")
+        print("BÚSQUEDA AVANZADA POR RUT")
+        row = buscarRut(input("rut a buscar: "))
+        if row > -1:
+                print(f"nombre: {matriz[row][1]}")
+                print(f"sueldo: {matriz[row][2]}")
+                input("\nEnter para continuar")
+        else:
+            input("no ha sido encontrado...")
+    except:
+        input("Excepcion al buscar")
+
+def mostrar():
+    try:
+        os.system("cls")
+        print(generarReporte())
+        input("\nEnter para continuar...")
+    except:
+        input("excepcion al mostrar")
+
+def remover():
+    try:
+        os.system("cls")
+        # pedir RUT A remover
+        fila = buscarRut(input("rut a remover: "))
+        # verifica que los rangos sean desde 1 hasta len(matriz)
+        if fila >= 0:
+            # remueve utilizando .pop(fila), NO utilices .remove()
+            persona = matriz.pop(fila)
+            input(f"{persona} HA SIDO REMOVIDA CON EXITO")
+        else:
+            input("rut no encontrado...")
+    except:
+        input("excepcion al remover")
+
+def editar():
+    try:
+        os.system("cls")
+        # pedir el rut
+        row = buscarRut(input("rut a editar: "))
+        # si el rut se encuentra, se pide nuevo nombre y nuevo sueldo y se reemplazan
+        if row > -1:
+            print(f"nombre: {matriz[row][1]}")
+            print(f"sueldo: {matriz[row][2]}")
+            print("nuevos valores: ")
+            matriz[row][1] = input("nombre nuevo: ")
+            matriz[row][2] = int(input("sueldo nuevo: "))
+            input("editado con exito!")
+        else:
+            input("rut no encontrado...")
+    except:
+        input("excepcion al editar")
+
+while True:
+    try:
+        os.system("cls")
+        opc = int(input(menu))
+        if opc == 0:
+            break
+        elif opc == 1:
+            agregar()
+        elif opc == 2:
+            mostrar()
+        elif opc == 3:
+            buscar()
+        elif opc == 4:
+            remover()
+        elif opc == 5:
+            editar()
+        elif opc == 6:
+            crearArchivo()
+        elif opc == 7:
+            exportarCSV()
+        elif opc == 8:
+            exportarJSON()
+        else:
+            input("opcion incorrecta")
+    except:
+        input("excepcion de menu")
+
+input("\nTerminando")
